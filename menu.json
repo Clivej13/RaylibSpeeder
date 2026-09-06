@@ -1,0 +1,107 @@
+{
+  "StartMenu": "Main",
+  "Menus": {
+    "Main": {
+      "Title": "RaylibSpeeder",
+      "Items": [
+        {
+          "Type": "Button",
+          "Text": "Start Game",
+          "Function": "StartGame"
+        },
+        {
+          "Type": "Button",
+          "Text": "Options",
+          "Function": "OpenMenu",
+          "Target": "Options"
+        },
+        {
+          "Type": "Button",
+          "Text": "Controls",
+          "Function": "OpenMenu",
+          "Target": "Controls"
+        },
+        {
+          "Type": "Button",
+          "Text": "Exit",
+          "Function": "ExitGame"
+        }
+      ]
+    },
+    "Options": {
+      "Title": "Options",
+      "Items": [
+        {
+          "Type": "Toggle",
+          "Text": "Fullscreen",
+          "Function": "SetFullscreen",
+          "Value": false
+        },
+        {
+          "Type": "Toggle",
+          "Text": "VSync",
+          "Function": "SetVSync",
+          "Value": true
+        },
+        {
+          "Type": "Label",
+          "Text": "Changes apply for this session."
+        },
+        {
+          "Type": "Button",
+          "Text": "Back",
+          "Function": "Back"
+        }
+      ]
+    },
+    "Controls": {
+      "Title": "Controls",
+      "Items": [
+        {
+          "Type": "KeyBind",
+          "Text": "Move Left",
+          "Function": "Rebind",
+          "Action": "MoveLeft"
+        },
+        {
+          "Type": "KeyBind",
+          "Text": "Move Right",
+          "Function": "Rebind",
+          "Action": "MoveRight"
+        },
+        {
+          "Type": "Label",
+          "Text": "Steer: A/D, arrows, left stick or D-pad"
+        },
+        {
+          "Type": "Label",
+          "Text": "Confirm: Enter / A   Back: Escape / B"
+        },
+        {
+          "Type": "Label",
+          "Text": "Avoid boxes. Back ends the current run."
+        },
+        {
+          "Type": "Button",
+          "Text": "Back",
+          "Function": "Back"
+        }
+      ]
+    },
+    "GameOver": {
+      "Title": "Game Over",
+      "Items": [
+        {
+          "Type": "Button",
+          "Text": "Retry",
+          "Function": "StartGame"
+        },
+        {
+          "Type": "Button",
+          "Text": "Main Menu",
+          "Function": "MainMenu"
+        }
+      ]
+    }
+  }
+}

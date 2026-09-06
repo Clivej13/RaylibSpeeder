@@ -15,4 +15,9 @@
     <PackageReference Include="RaylibGameFramework.Menus" Version="0.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="config.json;input.json;menu.json;assets.json"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
