@@ -1,0 +1,8 @@
+{
+  "WindowWidth": 1280,
+  "WindowHeight": 720,
+  "WindowTitle": "RaylibSpeeder",
+  "TargetFps": 60,
+  "VSync": true,
+  "Fullscreen": false
+}

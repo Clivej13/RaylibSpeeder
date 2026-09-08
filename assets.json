@@ -1,0 +1,19 @@
+{
+  "Assets": [
+    {
+      "Key": "PlayerShip",
+      "Type": "Model",
+      "Path": "Assets/Models/player_ship.glb"
+    },
+    {
+      "Key": "Pedestrian",
+      "Type": "Model",
+      "Path": "Assets/Models/pedestrian.glb"
+    },
+    {
+      "Key": "PedestrianAnimations",
+      "Type": "ModelAnimations",
+      "Path": "Assets/Models/pedestrian.glb"
+    }
+  ]
+}
