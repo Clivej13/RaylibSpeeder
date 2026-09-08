@@ -16,7 +16,9 @@ public sealed class GameApplication
     private readonly MenuManager _gameOverMenu;
     private readonly MenuDefinition _gameOverDefinition;
     private readonly AssetManager _assets;
-    private readonly SpeederGame _game = new();
+    private readonly SpeederGame _game;
+    private readonly CharacterDefinition _character = new();
+    private CharacterCreatorScreen? _characterCreator;
     private GameState _state = GameState.MainMenu;
     private bool _exitRequested;
 
@@ -40,6 +42,7 @@ public sealed class GameApplication
             Menus = menus.Menus
         }, _input, input);
         _assets = new AssetManager(assets);
+        _game = new SpeederGame(_assets);
     }
 
     public void Run()
@@ -58,19 +61,30 @@ public sealed class GameApplication
                 throw new InvalidOperationException("Raylib could not initialize the window.");
             Raylib.SetExitKey(KeyboardKey.Null);
             Raylib.SetTargetFPS(Math.Max(1, _config.TargetFps));
-            // Primitives have no required assets; the package still owns the catalogue/lifecycle.
-            _assets.SetRequiredAssets();
+            // Keep shared models and clips resident until all pedestrian instances are released.
+            _assets.SetRequiredAssets("PlayerShip", "Pedestrian", "PedestrianAnimations");
+            while (_assets.HasPendingWork)
+                _assets.ProcessNext();
 
             while (!_exitRequested && !Raylib.WindowShouldClose())
             {
                 _input.Update();
                 Update(Raylib.GetFrameTime());
                 Raylib.BeginDrawing();
-                Raylib.ClearBackground(_state == GameState.Playing ? new Color(14, 24, 38, 255) : Color.RayWhite);
+                Raylib.ClearBackground(_state == GameState.Playing || _state == GameState.GameOver
+                    ? new Color(14, 24, 38, 255)
+                    : _state == GameState.CharacterCreator
+                        ? new Color(25, 34, 44, 255)
+                        : Color.RayWhite);
                 if (_state == GameState.Playing)
                     _game.Draw();
                 else if (_state == GameState.GameOver)
+                {
+                    _game.Draw();
                     _gameOverMenu.Draw();
+                }
+                else if (_state == GameState.CharacterCreator)
+                    _characterCreator!.Draw();
                 else
                     _menus.Draw();
                 Raylib.EndDrawing();
@@ -80,7 +94,15 @@ public sealed class GameApplication
         {
             if (windowReady)
             {
-                try { _assets.UnloadAll(); }
+                try
+                {
+                    try
+                    {
+                        _game.ClearPedestrians();
+                        LeaveCharacterCreator();
+                    }
+                    finally { _assets.UnloadAll(); }
+                }
                 finally { Raylib.CloseWindow(); }
             }
         }
@@ -92,6 +114,21 @@ public sealed class GameApplication
         {
             case GameState.MainMenu:
                 HandleMenuAction(_menus.Update());
+                break;
+            case GameState.CharacterCreator:
+                _characterCreator!.Update(deltaTime);
+                if (_characterCreator.StartRequested)
+                {
+                    LeaveCharacterCreator();
+                    _game.Reset(_character);
+                    _state = GameState.Playing;
+                }
+                else if (_characterCreator.BackRequested)
+                {
+                    LeaveCharacterCreator();
+                    _menus.ReturnToStartMenu();
+                    _state = GameState.MainMenu;
+                }
                 break;
             case GameState.Playing:
                 if (_input.WasPressed("MenuBack"))
@@ -113,7 +150,10 @@ public sealed class GameApplication
                 if (_input.WasPressed("MenuBack"))
                     ReturnToMainMenu();
                 else
+                {
+                    _game.Update(deltaTime, 0);
                     HandleMenuAction(_gameOverMenu.Update());
+                }
                 break;
         }
     }
@@ -122,8 +162,14 @@ public sealed class GameApplication
     {
         switch (action?.Function)
         {
+            case "CharacterCreator":
+                EnterCharacterCreator();
+                break;
             case "StartGame":
-                _game.Reset();
+                EnterCharacterCreator();
+                break;
+            case "RetryGame":
+                _game.Reset(_character);
                 _state = GameState.Playing;
                 break;
             case "MainMenu":
@@ -147,8 +193,23 @@ public sealed class GameApplication
         }
     }
 
+    private void EnterCharacterCreator()
+    {
+        LeaveCharacterCreator();
+        _characterCreator = new CharacterCreatorScreen(_assets, _input, _character);
+        _state = GameState.CharacterCreator;
+    }
+
+    private void LeaveCharacterCreator()
+    {
+        _characterCreator?.Dispose();
+        _characterCreator = null;
+    }
+
     private void ReturnToMainMenu()
     {
+        _game.ClearPedestrians();
+        LeaveCharacterCreator();
         _menus.ReturnToStartMenu();
         _state = GameState.MainMenu;
     }
@@ -157,6 +218,7 @@ public sealed class GameApplication
 internal enum GameState
 {
     MainMenu,
+    CharacterCreator,
     Playing,
     GameOver
 }

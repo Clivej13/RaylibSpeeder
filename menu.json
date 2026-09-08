@@ -6,8 +6,8 @@
       "Items": [
         {
           "Type": "Button",
-          "Text": "Start Game",
-          "Function": "StartGame"
+          "Text": "Character Creator",
+          "Function": "CharacterCreator"
         },
         {
           "Type": "Button",
@@ -94,7 +94,7 @@
         {
           "Type": "Button",
           "Text": "Retry",
-          "Function": "StartGame"
+          "Function": "RetryGame"
         },
         {
           "Type": "Button",
